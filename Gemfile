@@ -5,7 +5,6 @@ gem 'rails', '3.1.1'
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
 
-gem 'activerecord-postgresql-adapter'
 gem 'mysql2'
 gem 'gmaps4rails'
 gem "yaml_db"
@@ -35,4 +34,8 @@ gem 'therubyracer'
 group :test do
   # Pretty printed test output
   gem 'turn', :require => false
+end
+
+group :production do
+  gem 'pg'
 end
