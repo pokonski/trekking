@@ -14,7 +14,9 @@ class RoutesController < ApplicationController
   # GET /routes/1.json
   def show
     @route = Route.find(params[:id])
-    @waypoints = @route.waypoints.order("waypoints.order ASC").all.to_gmaps4rails
+    @waypoints = @route.waypoints.order("waypoints.order ASC").all
+    @json = @waypoints.to_gmaps4rails
+
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @route }

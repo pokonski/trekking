@@ -1,6 +1,7 @@
 <h1><%= @route.name %></h1>
 
-<%= gmaps(:markers => {data: @waypoints }, :polylines => {data: "["+@waypoints+"]"}) %>
+<!-- markers => {data: @json, options: {draggable: true} } -->
+<%= gmaps(direction: {options: {waypoints: @waypoints.collect{|w| w.position},travelMode: "WALKING"},data: {from: @waypoints.first.position, to: @waypoints.last.position} }) %>
 
 <%= link_to 'Edit', edit_route_path(@route) %> |
 <%= link_to 'Back', routes_path %>
