@@ -1,0 +1,22 @@
+<%= form_for(@route) do |f| %>
+  <% if @route.errors.any? %>
+    <div class="alert-message block-message error">
+      <h2><%= pluralize(@route.errors.count, "error") %> prohibited this route from being saved:</h2>
+      <p>
+      <ul>
+      <% @route.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+      </p>
+    </div>
+  <% end %>
+
+  <div class="clearfix">
+    <%= f.label :name %>
+    <div class="input"><%= f.text_field :name %></div>
+  </div>
+  <div class="actions">
+    <%= f.submit :class => "btn primary" %>
+  </div>
+<% end %>

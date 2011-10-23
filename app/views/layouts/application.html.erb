@@ -1,14 +1,29 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html class="no-js" lang="en">
 <head>
-  <title>Trekking</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Trekking</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
   <%= stylesheet_link_tag    "application" %>
   <%= javascript_include_tag "application" %>
   <%= csrf_meta_tags %>
 </head>
 <body>
 
-<%= yield %>
+<div id="container">
+	<header>
+  <%= render :partial => "application/topbar" %>
+	</header>
+	<div id="main" role="main">
+    <%= yield %>
+	</div>
+	<footer>
 
+	</footer>
+</div> <!--! end of #container -->
+<%= yield :scripts %>
 </body>
 </html>

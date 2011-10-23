@@ -1,0 +1,30 @@
+<h1><%= @route.name %></h1>
+
+<%= gmaps(:markers => {data: @waypoints }, :polylines => {data: "["+@waypoints+"]"}) %>
+
+<%= link_to 'Edit', edit_route_path(@route) %> |
+<%= link_to 'Back', routes_path %>
+
+<% content_for :scripts do %>
+<script type="text/javascript" charset="utf-8">
+
+Gmaps.map.HandleDragend = function(pos) {
+  var geocoder = new google.maps.Geocoder();
+  geocoder.geocode({
+    latLng: pos
+  }, function(responses) {
+    if (responses && responses.length > 0) {
+      alert(responses[0].formatted_address);
+    } else {
+    alert('Cannot determine address at this location.');
+    }
+  });
+};
+
+Gmaps.map.callback = function() {
+  for (var i = 0; i <  this.markers.length; ++i) {
+     google.maps.event.addListener(Gmaps.map.markers[i].serviceObject, 'dragend', function() { Gmaps.map.HandleDragend(this.getPosition()) });
+  }
+};
+</script>
+<% end %>
