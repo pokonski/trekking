@@ -6,5 +6,6 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require gmaps4rails/all_apis.js
+
+
 
