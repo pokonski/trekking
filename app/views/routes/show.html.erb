@@ -30,10 +30,10 @@
 <script type="text/javascript">
 
 
-  google.load("visualization", "1", {packages: ["columnchart","corechart"]});
-  google.setOnLoadCallback(initVisualization);
+  //google.load("visualization", "1", {packages: ["columnchart","corechart"]});
+  //google.setOnLoadCallback(initVisualization);
 
-  var SAMPLES = 128;
+  var SAMPLES = 64;
   var map;
   var elevationService;
   var chart;
@@ -45,7 +45,8 @@
 
   var markers = [];
 function initVisualization(){
-  chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+
 }
 $(function(){
 
@@ -57,6 +58,7 @@ $(function(){
     draggableCursor: 'pointer'
   };
   map = new google.maps.Map(document.getElementById("map"), mapOptions);
+  chart = new google.visualization.LineChart(document.getElementById('chart_div'));
   elevationService = new google.maps.ElevationService();
 
   google.maps.event.addListener(map, 'rightclick', function(e) {
@@ -68,6 +70,8 @@ $(function(){
     waypoint = waypoint.split(',');
     addMarker(new google.maps.LatLng(waypoint[0],waypoint[1]));
   });
+  drawPath();
+  getElevation();
 });
   /*
   function calcRoute(points) {
@@ -134,7 +138,7 @@ $(function(){
     path.setMap(map);
     $('#distance').text((path.Distance()/1000).toFixed(2)+" km");
     $('#locations').text(markers.length);
-    getElevation();
+
   }
 
   function printLocations(){
@@ -162,6 +166,8 @@ $(function(){
       $.each(markers,function(index,marker){
         line.push(marker.getPosition());
       });
+      if (line.length == 0)
+        return false;
       elevationService.getElevationAlongPath({
         path: line,
         samples: SAMPLES
