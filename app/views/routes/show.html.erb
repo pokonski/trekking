@@ -12,10 +12,15 @@
 <div class="row">
   <div class="span13">
     <div id="map" style="width: 100%; height: 500px;"></div>
-
+    <div id="chart_div"></div>
   </div>
   <div class="span3">
-    <ul id="debug"></ul>
+    <dl>
+      <dt>Distance:</dt>
+      <dd id="distance"></dd>
+      <dt>Locations count:</dt>
+      <dd id="locations"></dd>
+    </dl>
   </div>
 </div>
 
@@ -25,16 +30,23 @@
 <script type="text/javascript">
 
 
+  google.load("visualization", "1", {packages: ["columnchart","corechart"]});
+  google.setOnLoadCallback(initVisualization);
 
-
+  var SAMPLES = 128;
   var map;
+  var elevationService;
+  var chart;
+
   var path = null;
   var poland = new google.maps.LatLng(54.381579,18.596039);
   var waypoints = <%= @route.locations.to_json.html_safe %>;
 
 
   var markers = [];
-
+function initVisualization(){
+  chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+}
 $(function(){
 
   var mapOptions = {
@@ -45,6 +57,7 @@ $(function(){
     draggableCursor: 'pointer'
   };
   map = new google.maps.Map(document.getElementById("map"), mapOptions);
+  elevationService = new google.maps.ElevationService();
 
   google.maps.event.addListener(map, 'rightclick', function(e) {
      addMarker(e.latLng);
@@ -120,6 +133,8 @@ $(function(){
     });
     path.setMap(map);
     $('#distance').text((path.Distance()/1000).toFixed(2)+" km");
+    $('#locations').text(markers.length);
+    getElevation();
   }
 
   function printLocations(){
@@ -141,4 +156,35 @@ $(function(){
       data: data
     });
   }
+
+  function getElevation(){
+      var line = [];
+      $.each(markers,function(index,marker){
+        line.push(marker.getPosition());
+      });
+      elevationService.getElevationAlongPath({
+        path: line,
+        samples: SAMPLES
+      }, plotElevation);
+    }
+  function plotElevation(results){
+    if (results == null)
+      return;
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Sample');
+    data.addColumn('number', 'Elevation');
+    for (var i = 0; i < results.length; i++) {
+      data.addRow(['', results[i].elevation]);
+    }
+
+    chart.draw(data, {
+      width: "100%",
+      height: 200,
+      legend: 'none',
+      titleY: 'Elevation (m)',
+      focusBorderColor: '#00ff00'
+    });
+
+    }
+
 </script>

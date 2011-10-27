@@ -8,6 +8,7 @@
 	<meta name="author" content="">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
   <%= stylesheet_link_tag    "application" %>
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
   <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
   <%= javascript_include_tag "application" %>
   <%= csrf_meta_tags %>
@@ -18,6 +19,12 @@
 	<header>
   <%= render :partial => "application/topbar" %>
 	</header>
+  <% if notice %>
+    <div class="alert-message success"><p><%= notice %></p></div>
+  <% end %>
+  <% if alert %>
+    <div class="alert-message error"><p><%= alert %></p></div>
+  <% end %>
 	<div id="main" role="main">
     <%= yield %>
 	</div>
