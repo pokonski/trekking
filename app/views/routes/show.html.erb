@@ -3,16 +3,23 @@
 <!-- markers => {data: @json, options: {draggable: true} } -->
 <div class="row">
   <div class="span13">
-    <h2>Map:</h2>
+    <ul class="tabs" data-tabs="true">
+      <li class="active"><a href="#tab-map">Map</a></li>
+      <li><a href="#tab-elevation">Elevation chart</a></li>
+    </ul>
   </div>
   <div class="span3">
     <h2>Details:</h2>
   </div>
 </div>
 <div class="row">
-  <div class="span13">
-    <div id="map" style="width: 100%; height: 500px;"></div>
-    <div id="chart_div"></div>
+  <div class="span13 tab-content">
+    <div id="tab-map" class="active">
+      <div id="map" style="width: 760px; height: 500px;"></div>
+    </div>
+    <div id="tab-elevation">
+      <div id="chart_div"></div>
+    </div>
   </div>
   <div class="span3">
     <dl>
@@ -173,7 +180,7 @@ $(function(){
     }
 
     chart.draw(data, {
-      width: "100%",
+      width: 760,
       height: 200,
       legend: 'none',
       titleY: 'Elevation (m)',

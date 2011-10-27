@@ -14,11 +14,8 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-
-<div id="container">
-	<header>
-  <%= render :partial => "application/topbar" %>
-	</header>
+<%= render :partial => "application/topbar" %>
+<div id="container" class="container">
   <% if notice %>
     <div class="alert-message success"><p><%= notice %></p></div>
   <% end %>
