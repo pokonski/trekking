@@ -49,9 +49,9 @@ function initVisualization(){
 
 }
 $(function(){
-
+  var centerAt = poland;
   var mapOptions = {
-    zoom: 100,
+    zoom: 10,
     mapTypeId: google.maps.MapTypeId.TERRAIN,
     center: poland,
     streetViewControl: false,
@@ -60,6 +60,7 @@ $(function(){
   map = new google.maps.Map(document.getElementById("map"), mapOptions);
   chart = new google.visualization.LineChart(document.getElementById('chart_div'));
   elevationService = new google.maps.ElevationService();
+
 
   google.maps.event.addListener(map, 'rightclick', function(e) {
      addMarker(e.latLng);
@@ -70,28 +71,14 @@ $(function(){
     waypoint = waypoint.split(',');
     addMarker(new google.maps.LatLng(waypoint[0],waypoint[1]));
   });
+
+  if (waypoints.length > 0)
+    map.fitBounds(constructBounds());
+
+
   drawPath();
   getElevation();
 });
-  /*
-  function calcRoute(points) {
-    var temp = points.slice();
-    var request = {
-      origin:  points[points.length-1].location,
-      optimizeWaypoints: true,
-      unitSystem: google.maps.UnitSystem.METRIC,
-      destination: points[0].location,
-      waypoints: temp.splice(1,temp.length-2),
-      travelMode: google.maps.DirectionsTravelMode.WALKING
-    };
-    console.log("start: " + request.origin + " end: " + request.destination + " waypoints: " + request.waypoints[0].location);
-    directionsService.route(request, function(response, status) {
-      if (status == google.maps.DirectionsStatus.OK) {
-        directionsDisplay.setDirections(response);
-      }
-    });
-  }
-    */
   function addMarker(pos,desc){
     var marker = new google.maps.Marker({
         position: pos,
@@ -194,5 +181,30 @@ $(function(){
     });
 
     }
+
+  function constructBounds(){
+    if (markers.length == 0)
+      return;
+
+    var m = markers[0].getPosition();
+        min_lat = m.lat(),
+        max_lat = m.lat(),
+        min_lng = m.lng(),
+        max_lng = m.lng();
+     $.each(markers,function(index,marker){
+       var lat = marker.getPosition().lat(),
+           lng = marker.getPosition().lng();
+       if (lat < min_lat)
+        min_lat = lat;
+       if (lat > max_lat)
+        max_lat = lat;
+       if (lng < min_lng)
+        min_lng = lng;
+       if (lng > max_lng)
+        max_lng = lng;
+     });
+
+    return new google.maps.LatLngBounds(new google.maps.LatLng(min_lat,min_lng), new google.maps.LatLng(max_lat,max_lng) );
+  }
 
 </script>
