@@ -104,10 +104,12 @@ $(function(){
       if (index > -1)
         markers.splice(index,1);
       drawPath();
+      getElevation();
       saveRoute();
     });
     google.maps.event.addListener(marker, 'drag', function(e) {
       drawPath();
+      getElevation();
     });
     google.maps.event.addListener(marker, 'dragend', function(e) {
       saveRoute();
