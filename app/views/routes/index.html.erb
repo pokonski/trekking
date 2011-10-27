@@ -3,15 +3,13 @@
 <table class="zebra-striped">
   <tr>
     <th>Name</th>
-    <th style="width: 15%"></th>
+    <th style="width: 5%"></th>
   </tr>
 
 <% @routes.each do |route| %>
   <tr>
-    <td><%= route.name %></td>
-    <td><%= link_to 'Show', route %>
-    <%= link_to 'Edit', edit_route_path(route) %>
-    <%= link_to 'Destroy', route, confirm: 'Are you sure?', method: :delete %></td>
+    <td><%= link_to route.name, route %> <% if route.created_at > 2.hours.ago %><span class="label success">New</span><% end %></td>
+    <td><%= link_to 'Destroy', route, confirm: 'Are you sure?', method: :delete %></td>
   </tr>
 <% end %>
 </table>

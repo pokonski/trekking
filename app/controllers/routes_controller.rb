@@ -14,8 +14,6 @@ class RoutesController < ApplicationController
   # GET /routes/1.json
   def show
     @route = Route.find(params[:id])
-    @waypoints = @route.waypoints.order("waypoints.order DESC").all
-    @json = @waypoints.to_gmaps4rails
 
     respond_to do |format|
       format.html # show.html.erb
@@ -47,7 +45,7 @@ class RoutesController < ApplicationController
     respond_to do |format|
       if @route.save
         format.html { redirect_to @route, notice: 'Route was successfully created.' }
-        format.json { render json: @route, status: :created, location: @route }
+        format.json { head :ok }
       else
         format.html { render action: "new" }
         format.json { render json: @route.errors, status: :unprocessable_entity }
@@ -59,7 +57,9 @@ class RoutesController < ApplicationController
   # PUT /routes/1.json
   def update
     @route = Route.find(params[:id])
-
+    #if params[:route][:waypoints_attributes]
+    #  @route.waypoints.destroy_all
+    #end
     respond_to do |format|
       if @route.update_attributes(params[:route])
         format.html { redirect_to @route, notice: 'Route was successfully updated.' }

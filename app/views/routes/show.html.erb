@@ -1,8 +1,23 @@
 <h1><%= @route.name %></h1>
 
 <!-- markers => {data: @json, options: {draggable: true} } -->
-<% gmaps(direction: {options: {waypoints: @waypoints.collect{|w| w.position},travelMode: "WALKING"},data: {from: @waypoints.first.position, to: @waypoints.last.position} }) %>
-<div id="waypoints" style="width: 900px; height: 500px;"></div>
+<div class="row">
+  <div class="span13">
+    <h2>Map:</h2>
+  </div>
+  <div class="span3">
+    <h2>Details:</h2>
+  </div>
+</div>
+<div class="row">
+  <div class="span13">
+    <div id="map" style="width: 100%; height: 500px;"></div>
+
+  </div>
+  <div class="span3">
+    <ul id="debug"></ul>
+  </div>
+</div>
 
 <%= link_to 'Edit', edit_route_path(@route) %> |
 <%= link_to 'Back', routes_path %>
@@ -11,43 +26,36 @@
 
 
 
-  var rendererOptions = {
-    draggable: true,
-    markerOptions: {}
-  };
-  var directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);;
-  var directionsService = new google.maps.DirectionsService();
+
   var map;
-
+  var path = null;
   var poland = new google.maps.LatLng(54.381579,18.596039);
-  var markers = <%= @waypoints.collect{|w| {position: w.position,draggable: true}}.to_json.html_safe %>;
+  var waypoints = <%= @route.locations.to_json.html_safe %>;
 
+
+  var markers = [];
 
 $(function(){
 
-    var myOptions = {
-      zoom: 7,
-      mapTypeId: google.maps.MapTypeId.TERRAIN,
-      center: poland
-    };
-    map = new google.maps.Map(document.getElementById("waypoints"), myOptions);
-    directionsDisplay.setMap(map);
+  var mapOptions = {
+    zoom: 100,
+    mapTypeId: google.maps.MapTypeId.TERRAIN,
+    center: poland,
+    streetViewControl: false,
+    draggableCursor: 'pointer'
+  };
+  map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
-    google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
-      //computeTotalDistance(directionsDisplay.directions);
-    });
-   google.maps.event.addListener(map, 'rightclick', function(e) {
+  google.maps.event.addListener(map, 'rightclick', function(e) {
      addMarker(e.latLng);
-   });
-  var flightPath = new google.maps.Polyline({
-    path: markers,
-    strokeColor: "#FF0000",
-    strokeOpacity: 1.0,
-    strokeWeight: 2
+     saveRoute();
   });
-
-  flightPath.setMap(map);
+  // zaznacz na mapie punkty wczytane z bazy
+  $.each(waypoints,function(index,waypoint){
+    waypoint = waypoint.split(',');
+    addMarker(new google.maps.LatLng(waypoint[0],waypoint[1]));
   });
+});
   /*
   function calcRoute(points) {
     var temp = points.slice();
@@ -67,13 +75,70 @@ $(function(){
     });
   }
     */
-  function addMarker(pos){
+  function addMarker(pos,desc){
     var marker = new google.maps.Marker({
         position: pos,
         draggable: true,
-        map: map,
-        title:"Hello World!"
+        map: map
+    });
+    google.maps.event.addListener(marker, 'dblclick', function(e) {
+      marker.setMap(null);
+      var index = $.inArray(marker,markers);
+      if (index > -1)
+        markers.splice(index,1);
+      drawPath();
+      saveRoute();
+    });
+    google.maps.event.addListener(marker, 'drag', function(e) {
+      drawPath();
+    });
+    google.maps.event.addListener(marker, 'dragend', function(e) {
+      saveRoute();
+    });
+    markers.push(marker);
+
+    drawPath();
+    printLocations();
+  }
+  function clearPath() {
+    if (path)
+      path.setMap(null);
+  }
+  function drawPath(){
+    clearPath();
+
+
+    var line = [];
+    $.each(markers,function(index,marker){
+      line.push(marker.position);
+    });
+    path = new google.maps.Polyline({
+      path: line,
+      strokeColor: "#FF0000",
+      strokeOpacity: 1.0,
+      strokeWeight: 2
+    });
+    path.setMap(map);
+    $('#distance').text((path.Distance()/1000).toFixed(2)+" km");
+  }
+
+  function printLocations(){
+    var debug = $('#debug');
+    debug.text('');
+    $.each(markers,function(index,marker){
+      debug.append($("<li/>").text(marker.position.toString()));
     });
   }
 
+  function saveRoute(){
+    var data = {route: {locations: []}};
+    $.each(markers,function(index,marker){
+      data["route"]["locations"].push(marker.position.lat()+","+marker.position.lng());
+    });
+    $.ajax({
+      url: '<%= route_path(@route, :json) %>',
+      type: 'PUT',
+      data: data
+    });
+  }
 </script>

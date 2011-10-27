@@ -1,4 +1,4 @@
 class Route < ActiveRecord::Base
   validates :name, :presence => true
-  has_many :waypoints
+  serialize :locations, Array
 end
