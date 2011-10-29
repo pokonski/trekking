@@ -1,0 +1,13 @@
+development:
+  host: localhost
+  database: trekking_development
+  autocreate_indexes: true
+
+test:
+  host: localhost
+  database: trekking_test
+
+# set these environment variables on your prod server
+production:
+  uri: <%= ENV['MONGOLAB_URI'] %>
+  autocreate_indexes: true

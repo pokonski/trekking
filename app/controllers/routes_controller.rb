@@ -57,9 +57,12 @@ class RoutesController < ApplicationController
   # PUT /routes/1.json
   def update
     @route = Route.find(params[:id])
-    #if params[:route][:waypoints_attributes]
-    #  @route.waypoints.destroy_all
-    #end
+    if params[:route][:waypoints]
+      @route.waypoints.delete_all
+      for waypoint in params[:route][:waypoints]
+        @route.waypoints << Waypoint.new(waypoint[1])
+      end
+    end
     respond_to do |format|
       if @route.update_attributes(params[:route])
         format.html { redirect_to @route, notice: 'Route was successfully updated.' }
@@ -68,6 +71,20 @@ class RoutesController < ApplicationController
         format.html { render action: "edit" }
         format.json { render json: @route.errors, status: :unprocessable_entity }
       end
+    end
+  end
+
+  def update_waypoints
+    route = Route.find(params[:id])
+    if params[:route][:waypoints]
+      route.waypoints.delete_all
+      for waypoint in params[:route][:waypoints]
+        route.waypoints << Waypoint.new(waypoint[1])
+      end
+    end
+
+    respond_to do |format|
+      format.json {head :ok}
     end
   end
 

@@ -47,7 +47,7 @@
 
   var path = null;
   var poland = new google.maps.LatLng(54.381579,18.596039);
-  var waypoints = <%= @route.locations.to_json.html_safe %>;
+  var waypoints = <%= @route.waypoints.collect{|w| w.location.reverse.join(',')}.to_json.html_safe %>;
 
 
   var markers = [];
@@ -70,7 +70,7 @@ $(function(){
 
 
   google.maps.event.addListener(map, 'rightclick', function(e) {
-     addMarker(e.latLng);
+     addMarker(e.latLng,true);
      saveRoute();
   });
   // zaznacz na mapie punkty wczytane z bazy
@@ -86,7 +86,7 @@ $(function(){
   drawPath();
   getElevation();
 });
-  function addMarker(pos,desc){
+  function addMarker(pos,save){
     var marker = new google.maps.Marker({
         position: pos,
         draggable: true,
@@ -107,6 +107,7 @@ $(function(){
     });
     google.maps.event.addListener(marker, 'dragend', function(e) {
       saveRoute();
+
     });
     markers.push(marker);
 
@@ -146,12 +147,12 @@ $(function(){
   }
 
   function saveRoute(){
-    var data = {route: {locations: []}};
+    var data = {route: {waypoints: []}};
     $.each(markers,function(index,marker){
-      data["route"]["locations"].push(marker.position.lat()+","+marker.position.lng());
+      data["route"]["waypoints"].push({location: [marker.position.lng(),marker.position.lat()]});
     });
     $.ajax({
-      url: '<%= route_path(@route, :json) %>',
+      url: '<%= update_waypoints_route_path(@route, :json) %>',
       type: 'PUT',
       data: data
     });

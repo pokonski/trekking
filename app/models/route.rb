@@ -1,4 +1,11 @@
-class Route < ActiveRecord::Base
+class Route
+  include Mongoid::Document
+  include Mongoid::Timestamps
+
+  field :name, type: String
+
   validates :name, :presence => true
-  serialize :locations, Array
+
+  embeds_many :waypoints
+
 end
