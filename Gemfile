@@ -9,6 +9,9 @@ gem 'mysql2'
 gem "yaml_db"
 gem "bson_ext"
 gem "mongoid"
+gem 'devise'
+gem 'simple_form'
+gem 'haml'
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -23,7 +26,6 @@ gem 'jquery-rails'
 gem 'therubyracer'
 
 group :test do
-  # Pretty printed test output
   gem 'turn', :require => false
 end
 

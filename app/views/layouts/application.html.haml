@@ -1,0 +1,26 @@
+!!! 5
+%html
+  %head
+    %meta{charset: "utf-8"}
+    %title Trekking
+    %meta{name: "description", content: ""}
+    %meta{name: "author", content: ""}
+    %meta{name: "viewport", content: "width=device-width,initial-scale=1"}
+    = stylesheet_link_tag "application"
+    %script{type: "text/javascript", src: 'https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1","packages":["corechart"]}]}'}
+    %script{type: "text/javascript", src: "http://maps.google.com/maps/api/js?sensor=true"}
+    = javascript_include_tag "application"
+    = csrf_meta_tags
+%body
+  = render :partial => "application/topbar"
+  #container.container
+    - if notice
+      .alert-message.success{"data-alert" => true}
+        %a.close{href: "#"} ×
+        %p= notice
+    - if alert
+      .alert-message.error{"data-alert" => true}
+        %a.close{href: "#"} ×
+        %p= alert
+    #main{role: "main"}
+      = yield

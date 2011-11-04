@@ -1,0 +1,16 @@
+%h1 Listing routes
+
+%table.zebra-striped
+  %tr
+    %th Name
+    %th{style: "width: 5%"}
+
+  - @routes.each do |route|
+    %tr
+      %td
+        = link_to route.name, route
+        - if route.created_at > 2.hours.ago
+          %span.label.success New
+      %td= link_to 'Destroy', route, confirm: 'Are you sure?', method: :delete
+
+= link_to 'New Route', new_route_path, :class => "btn primary"

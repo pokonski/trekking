@@ -5,7 +5,7 @@ class RoutesController < ApplicationController
     @routes = Route.all
 
     respond_to do |format|
-      format.html # index.html.erb
+      format.html # index.html.haml
       format.json { render json: @routes }
     end
   end
@@ -16,7 +16,7 @@ class RoutesController < ApplicationController
     @route = Route.find(params[:id])
 
     respond_to do |format|
-      format.html # show.html.erb
+      format.html # show.html.haml
       format.json { render json: @route }
     end
   end
@@ -27,7 +27,7 @@ class RoutesController < ApplicationController
     @route = Route.new
 
     respond_to do |format|
-      format.html # new.html.erb
+      format.html # new.html.haml
       format.json { render json: @route }
     end
   end
@@ -76,8 +76,8 @@ class RoutesController < ApplicationController
 
   def update_waypoints
     route = Route.find(params[:id])
-    if params[:route][:waypoints]
-      route.waypoints.delete_all
+    route.waypoints.delete_all
+    if params[:route]
       for waypoint in params[:route][:waypoints]
         route.waypoints << Waypoint.new(waypoint[1])
       end

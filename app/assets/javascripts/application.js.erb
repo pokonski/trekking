@@ -1,0 +1,158 @@
+// This is a manifest file that'll be compiled into including all the files listed below.
+// Add new JavaScript/Coffee code in separate files in this directory and they'll automatically
+// be included in the compiled file accessible from http://example.com/assets/application.js.erb
+// It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
+// the compiled file.
+//
+//= require jquery
+//= require jquery_ujs
+//= require v3_epoly
+//= require bootstrap-tabs
+//= require bootstrap-dropdown
+//= require bootstrap-alerts
+//= require_self
+
+// probkowanie na wykresie
+var SAMPLES = 64;
+var elevations = [];
+function constructBounds(markers){
+  if (markers.length == 0)
+    return;
+  var m = markers[0].getPosition(),
+     min_lat = m.lat(),
+     max_lat = m.lat(),
+     min_lng = m.lng(),
+     max_lng = m.lng();
+  $.each(markers,function(index,marker){
+    var lat = marker.getPosition().lat(),
+        lng = marker.getPosition().lng();
+    if (lat < min_lat)
+      min_lat = lat;
+    if (lat > max_lat)
+      max_lat = lat;
+    if (lng < min_lng)
+      min_lng = lng;
+    if (lng > max_lng)
+      max_lng = lng;
+   });
+
+  return new google.maps.LatLngBounds(new google.maps.LatLng(min_lat,min_lng), new google.maps.LatLng(max_lat,max_lng) );
+}
+
+  function addMarker(map,markers,pos,save){
+    var marker = new google.maps.Marker({
+        position: pos,
+        draggable: true,
+        map: map
+    });
+    google.maps.event.addListener(marker, 'rightclick', function(e) {
+      marker.setMap(null);
+      var index = $.inArray(marker,markers);
+      if (index > -1)
+        markers.splice(index,1);
+      drawPath(markers);
+      getElevation(markers);
+      setIcons(markers);
+      saveRoute(UPDATE_PATH,markers);
+    });
+    google.maps.event.addListener(marker, 'drag', function(e) {
+      drawPath(markers);
+      getElevation(markers);
+    });
+    google.maps.event.addListener(marker, 'dragend', function(e) {
+      setIcons(markers);
+      saveRoute(UPDATE_PATH,markers);
+
+    });
+    markers.push(marker);
+    setIcons(markers);
+    drawPath(markers);
+  }
+
+  function setIcons(markers){
+    if (typeof markers === "undefined" || markers.length == 0)
+        return false;
+    var start_icon = "<%= image_path 'start.png' %>",
+        finish_icon = "<%= image_path 'finish.png' %>",
+        waypoint_icon = "<%= image_path 'hiking.png' %>";
+
+    markers[0].setIcon(start_icon);
+    for(var i=1; i < markers.length-1; i++)
+      markers[i].setIcon(waypoint_icon);
+    markers[markers.length-1].setIcon(finish_icon);
+  }
+
+  function clearPath() {
+    if (path)
+      path.setMap(null);
+  }
+
+  function drawPath(markers){
+    clearPath();
+    var line = [];
+    $.each(markers,function(index,marker){
+      line.push(marker.position);
+    });
+
+    path = new google.maps.Polyline({
+      path: line,
+      strokeColor: "#0069D6",
+      strokeOpacity: 0.8,
+      strokeWeight: 2.5
+    });
+    path.setMap(map);
+
+    $('#distance').text((path.Distance()/1000).toFixed(2)+" km");
+    $('#locations').text(markers.length);
+
+  }
+
+  function getElevation(markers){
+      var line = [];
+      if (typeof markers === "undefined" || markers.length <= 1)
+        return false;
+      $.each(markers,function(index,marker){
+        line.push(marker.getPosition());
+      });
+
+      elevationService.getElevationAlongPath({
+        path: line,
+        samples: SAMPLES
+      }, plotElevation);
+    }
+
+  function plotElevation(results){
+    if (results == null)
+      return;
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Sample');
+    data.addColumn('number', 'Elevation');
+    for (var i = 0; i < results.length; i++) {
+      data.addRow(['', results[i].elevation]);
+    }
+    elevations = results;
+
+    chart.draw(data, {
+      width: 760,
+      height: 200,
+      legend: 'none',
+      titleY: 'Elevation (m)',
+      focusBorderColor: '#00ff00'
+    });
+
+
+    }
+
+
+  function saveRoute(update_path,markers){
+    var data = {route: {waypoints: []}};
+    $.each(markers,function(index,marker){
+      data["route"]["waypoints"].push({location: [marker.position.lng(),marker.position.lat()]});
+    });
+
+    $.ajax({
+      url: update_path,
+      type: 'PUT',
+      data: data
+    });
+  }
