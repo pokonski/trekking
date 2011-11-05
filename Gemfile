@@ -5,7 +5,6 @@ gem 'rails', '3.1.1'
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
 
-gem 'mysql2'
 gem "yaml_db"
 gem "bson_ext"
 gem "mongoid"
@@ -29,8 +28,4 @@ gem 'therubyracer'
 
 group :test do
   gem 'turn', :require => false
-end
-
-group :production do
-  gem 'pg'
 end
