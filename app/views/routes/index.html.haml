@@ -6,27 +6,29 @@
     = link_to "Routes", routes_path
 
 %h1 Listing routes
-- if user_signed_in?
-  = link_to 'New Route', new_route_path, :class => "pull-right btn success bottom-space"
-- else
-  = link_to 'New Route', "#", :class => "pull-right btn success bottom-space disabled", :rel => "twipsy", "data-placemenet" => "left", :title => "You must be signed it to create new routes"
+.row
+  .span13
+    %table.zebra-striped
+      %tr
+        %th Name
+        %th Owner
+        %th Created ago
+        %th{style: "width: 5%"}
 
-%table.zebra-striped
-  %tr
-    %th Name
-    %th Owner
-    %th Created ago
-    %th{style: "width: 5%"}
-
-  - @routes.each do |route|
-    %tr
-      %td
-        = link_to route.name, route
-        - if route.created_at > 2.hours.ago
-          %span.label.success New
-      %td= route.user.try(:email)
-      %td= time_ago_in_words(route.created_at, true)
-      %td
-        = link_to 'Destroy', route, confirm: 'Are you sure?', method: :delete if can? :destroy, route
+      - @routes.each do |route|
+        %tr
+          %td
+            = link_to route.name, route
+            - if route.created_at > 2.hours.ago
+              %span.label.success New
+          %td= route.user.try(:email)
+          %td= time_ago_in_words(route.created_at, true)
+          %td
+            = link_to 'Destroy', route, confirm: 'Are you sure?', method: :delete if can? :destroy, route
+  .span3
+    - if user_signed_in?
+      = link_to 'New Route', new_route_path, :class => "pull-right btn large danger"
+    - else
+      = link_to 'New Route', "#", :class => "pull-right btn danger large disabled", :rel => "twipsy", "data-placemenet" => "left", :title => "You must be signed it to create new routes"
 
 = paginate @routes, :outer_window => 2, :window => 2
