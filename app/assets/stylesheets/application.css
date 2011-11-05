@@ -9,3 +9,14 @@
 body{
   padding-top: 70px;
 }
+.pagination.center,
+.pagination.center ul {
+    float: left;
+    position: relative;
+}
+.pagination.center { left: 50%; }
+.pagination.center ul { left: -50%; }
+
+.bottom-space{
+  margin-bottom: 20px;
+}

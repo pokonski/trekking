@@ -1,0 +1,59 @@
+%ul.breadcrumb
+  %li.active
+    = link_to "Homepage", root_path
+
+%h2 Recently added routes
+#map{style: "width: 760px; height: 500px;"}
+
+
+:javascript
+  var map;
+  var EDITABLE = false;
+  var path = null;
+  var poland = new google.maps.LatLng(54.381579,18.596039);
+  var routes = #{@routes.collect{|r| r.waypoints.collect{|w| {location: w.location,url: route_url(r)}}}.to_json.html_safe};
+  var paths = [];
+
+  var markers = [];
+  var allMarkers = [];
+  $(function(){
+    var mapOptions = {
+      zoom: 10,
+      mapTypeId: google.maps.MapTypeId.TERRAIN,
+      center: poland,
+      streetViewControl: false
+    };
+    map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+    // zaznacz na mapie punkty wczytane z bazy
+    $.each(routes,function(i,route){
+      markers[i] = [];
+      $.each(route,function(j,waypoint){
+        var m = addMarker(map,markers[i],new google.maps.LatLng(waypoint.location[1],waypoint.location[0]),true,waypoint.url);
+        google.maps.event.addListener(m, 'click', function() {
+          window.location.href = m.url;
+        });
+        allMarkers.push(m);
+      });
+    });
+
+    if (allMarkers.length > 0){
+      map.fitBounds(constructBounds(allMarkers));
+    }
+
+    for(var i=0; i < markers.length; i++){
+      var line = [];
+      $.each(markers[i],function(index,marker){
+        line.push(marker.position);
+      });
+      var color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+      var path = new google.maps.Polyline({
+        path: line,
+        strokeColor: color,
+        strokeOpacity: 1,
+        strokeWeight: 4
+      });
+      path.setMap(map);
+      paths.push(path);
+    }
+  });

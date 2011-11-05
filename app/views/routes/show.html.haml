@@ -1,4 +1,17 @@
-%h1= @route.name
+%ul.breadcrumb
+  %li
+    = link_to "Homepage", root_path
+    %span.divider /
+  %li
+    = link_to "Routes", routes_path
+    %span.divider /
+  %li.active= link_to @route.name, @route
+
+%h1
+  = @route.name
+  %small
+    by
+    = @route.user.email
 
 .row
   .span13
@@ -13,9 +26,10 @@
 .row
   .span13.tab-content
     #tab-map.active.tab-pane
-      %p
-        %span.label.notice Instructions
-        Right click on the map to place a waypoint, right click on the waypoint to remove it. Click and drag to move.
+      - if can? :edit, @route
+        %p
+          %span.label.notice Instructions
+          Right click on the map to place a waypoint, right click on the waypoint to remove it. Click and drag to move.
       #map{style: "width: 760px; height: 500px;"}
     #tab-elevation.tab-pane
       #chart_div
@@ -26,17 +40,16 @@
       %dt Waypoints count:
       %dd#locations
 
-= link_to 'Edit', edit_route_path(@route)
-|
 = link_to 'Back', routes_path
 
 :javascript
+  var EDITABLE = #{can? :edit, @route};
   var UPDATE_PATH = "#{update_waypoints_route_path(@route, :json)}";
   var map, elevationService, chart;
 
   var path = null;
   var poland = new google.maps.LatLng(54.381579,18.596039);
-  var waypoints = #{@route.waypoints.collect{|w| w.location.reverse.join(',')}.to_json.html_safe};
+  var waypoints = #{@route.waypoints.collect{|w| w.location}.to_json.html_safe};
 
 
   var markers = [];
@@ -53,16 +66,9 @@
     chart = new google.visualization.LineChart(document.getElementById('chart_div'));
     elevationService = new google.maps.ElevationService();
 
-
-    google.maps.event.addListener(map, 'rightclick', function(e) {
-       addMarker(map,markers,e.latLng,true);
-       saveRoute(UPDATE_PATH,markers);
-    });
-
     // zaznacz na mapie punkty wczytane z bazy
     $.each(waypoints,function(index,waypoint){
-      waypoint = waypoint.split(',');
-      addMarker(map,markers,new google.maps.LatLng(waypoint[0],waypoint[1]));
+      addMarker(map,markers,new google.maps.LatLng(waypoint[1],waypoint[0]));
     });
 
     if (waypoints.length > 0){
@@ -70,8 +76,14 @@
       $('#elevation-item').show();
     }
 
-
-
     drawPath(markers);
     getElevation(markers);
+
+    google.maps.event.addListener(map, 'rightclick', function(e) {
+       if (!EDITABLE)
+        return false;
+       addMarker(map,markers,e.latLng);
+       saveRoute(UPDATE_PATH,markers);
+       $('#elevation-item').show();
+    });
   });

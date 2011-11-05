@@ -39,17 +39,20 @@ function constructBounds(markers){
   return new google.maps.LatLngBounds(new google.maps.LatLng(min_lat,min_lng), new google.maps.LatLng(max_lat,max_lng) );
 }
 
-  function addMarker(map,markers,pos,save){
+  function addMarker(map,markers,pos,skip_middle,url){
     var marker = new google.maps.Marker({
         position: pos,
-        draggable: true,
-        map: map
+        draggable: EDITABLE,
+        map: map,
+        url: url
     });
     google.maps.event.addListener(marker, 'rightclick', function(e) {
       marker.setMap(null);
       var index = $.inArray(marker,markers);
       if (index > -1)
         markers.splice(index,1);
+      if (markers.length == 1)
+        $('#elevation-item').hide();
       drawPath(markers);
       getElevation(markers);
       setIcons(markers);
@@ -65,21 +68,26 @@ function constructBounds(markers){
 
     });
     markers.push(marker);
-    setIcons(markers);
+    setIcons(markers,skip_middle);
     drawPath(markers);
+    return marker;
   }
 
-  function setIcons(markers){
+  function setIcons(markers,skip_middle){
     if (typeof markers === "undefined" || markers.length == 0)
         return false;
     var start_icon = "<%= image_path 'start.png' %>",
         finish_icon = "<%= image_path 'finish.png' %>",
         waypoint_icon = "<%= image_path 'hiking.png' %>";
-
+    if (skip_middle == true)
+      waypoint_icon = "http://maps.gstatic.com/mapfiles/transparent.png";
     markers[0].setIcon(start_icon);
+    markers[0].setTitle("Start");
     for(var i=1; i < markers.length-1; i++)
       markers[i].setIcon(waypoint_icon);
+
     markers[markers.length-1].setIcon(finish_icon);
+    markers[markers.length-1].setTitle("Finish");
   }
 
   function clearPath() {
@@ -145,6 +153,8 @@ function constructBounds(markers){
 
 
   function saveRoute(update_path,markers){
+    if (!EDITABLE)
+      return false;
     var data = {route: {waypoints: []}};
     $.each(markers,function(index,marker){
       data["route"]["waypoints"].push({location: [marker.position.lng(),marker.position.lat()]});

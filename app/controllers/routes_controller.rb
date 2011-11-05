@@ -1,8 +1,8 @@
 class RoutesController < ApplicationController
-  # GET /routes
-  # GET /routes.json
+  load_and_authorize_resource
+
   def index
-    @routes = Route.all
+    @routes = Route.order_by([:created_at,:desc]).page params[:page]
 
     respond_to do |format|
       format.html # index.html.haml
@@ -13,8 +13,6 @@ class RoutesController < ApplicationController
   # GET /routes/1
   # GET /routes/1.json
   def show
-    @route = Route.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.haml
       format.json { render json: @route }
@@ -34,13 +32,14 @@ class RoutesController < ApplicationController
 
   # GET /routes/1/edit
   def edit
-    @route = Route.find(params[:id])
+
   end
 
   # POST /routes
   # POST /routes.json
   def create
     @route = Route.new(params[:route])
+    @route.user = current_user
 
     respond_to do |format|
       if @route.save
@@ -56,7 +55,7 @@ class RoutesController < ApplicationController
   # PUT /routes/1
   # PUT /routes/1.json
   def update
-    @route = Route.find(params[:id])
+
     if params[:route][:waypoints]
       @route.waypoints.delete_all
       for waypoint in params[:route][:waypoints]
