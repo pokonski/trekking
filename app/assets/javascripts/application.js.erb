@@ -10,8 +10,14 @@
 //= require bootstrap-tabs
 //= require bootstrap-dropdown
 //= require bootstrap-alerts
+//= require bootstrap-twipsy
 //= require_self
 
+$(function(){
+  $('*[rel="twipsy"]').twipsy({
+    animate: true
+  });
+});
 // probkowanie na wykresie
 var SAMPLES = 64;
 var elevations = [];

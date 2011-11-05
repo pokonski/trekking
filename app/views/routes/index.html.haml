@@ -6,7 +6,10 @@
     = link_to "Routes", routes_path
 
 %h1 Listing routes
-= link_to 'New Route', new_route_path, :class => "pull-right btn success bottom-space"
+- if user_signed_in?
+  = link_to 'New Route', new_route_path, :class => "pull-right btn success bottom-space"
+- else
+  = link_to 'New Route', "#", :class => "pull-right btn success bottom-space disabled", :rel => "twipsy", "data-placemenet" => "left", :title => "You must be signed it to create new routes"
 
 %table.zebra-striped
   %tr
