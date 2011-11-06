@@ -1,6 +1,5 @@
 class RoutesController < ApplicationController
-  load_and_authorize_resource
-
+  before_filter :authenticate_user!, :only => [:new,:edit,:create,:update,:update_waypoints]
   def index
     @routes = Route.order_by([:created_at,:desc]).page params[:page]
 
@@ -10,33 +9,47 @@ class RoutesController < ApplicationController
     end
   end
 
-  # GET /routes/1
-  # GET /routes/1.json
+  def search
+    redirect_to near_routes_path(:address => params[:address].gsub(" ","+"))
+  end
+
+  def near
+    radius = 6371
+    distance = 50
+    loc = Geocoder.coordinates(params[:address])
+    if loc.nil?
+      @routes = []
+    else
+      @routes = Route.where("waypoints.location" => {"$within" => {"$centerSphere" => [loc.reverse, (distance.fdiv radius)]}}).page params[:page]
+    end
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @routes }
+    end
+  end
+
+
   def show
+    @route = Route.find(params[:id])
     respond_to do |format|
       format.html # show.html.haml
       format.json { render json: @route }
     end
   end
 
-  # GET /routes/new
-  # GET /routes/new.json
   def new
     @route = Route.new
-
     respond_to do |format|
       format.html # new.html.haml
       format.json { render json: @route }
     end
   end
 
-  # GET /routes/1/edit
   def edit
-
+    @route = Route.find(params[:id])
   end
 
-  # POST /routes
-  # POST /routes.json
   def create
     @route = Route.new(params[:route])
     @route.user = current_user
@@ -52,16 +65,8 @@ class RoutesController < ApplicationController
     end
   end
 
-  # PUT /routes/1
-  # PUT /routes/1.json
   def update
-
-    if params[:route][:waypoints]
-      @route.waypoints.delete_all
-      for waypoint in params[:route][:waypoints]
-        @route.waypoints << Waypoint.new(waypoint[1])
-      end
-    end
+    @route = Route.find(params[:id])
     respond_to do |format|
       if @route.update_attributes(params[:route])
         format.html { redirect_to @route, notice: 'Route was successfully updated.' }
@@ -74,21 +79,22 @@ class RoutesController < ApplicationController
   end
 
   def update_waypoints
-    route = Route.find(params[:id])
-    route.waypoints.delete_all
+    @route = Route.find(params[:id])
+    waypoints = []
     if params[:route]
       for waypoint in params[:route][:waypoints]
-        route.waypoints << Waypoint.new(waypoint[1])
+        w = Waypoint.new(:location => waypoint[1][:location].collect{|c| c.to_f})
+        waypoints << w
       end
     end
+
+   @route.waypoints = waypoints
 
     respond_to do |format|
       format.json {head :ok}
     end
   end
 
-  # DELETE /routes/1
-  # DELETE /routes/1.json
   def destroy
     @route = Route.find(params[:id])
     @route.destroy

@@ -10,4 +10,5 @@ class Route
 
   embeds_many :waypoints
   belongs_to :user
+  index [[ "waypoints.location", Mongo::GEO2D ]], min: -180, max: 180
 end
