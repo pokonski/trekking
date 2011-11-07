@@ -18,6 +18,7 @@ $(function(){
     animate: true
   });
 });
+var RELATIVE = '<%= ENV['RAILS_RELATIVE_URL_ROOT'] %>';
 // probkowanie na wykresie
 var SAMPLES = 64;
 var elevations = [];
@@ -82,9 +83,9 @@ function constructBounds(markers){
   function setIcons(markers,skip_middle){
     if (typeof markers === "undefined" || markers.length == 0)
         return false;
-    var start_icon = "<%= image_path 'start.png' %>",
-        finish_icon = "<%= image_path 'finish.png' %>",
-        waypoint_icon = "<%= image_path 'hiking.png' %>";
+    var start_icon = RELATIVE+"/<%= image_path '/start.png' %>",
+        finish_icon = RELATIVE+"/<%= image_path 'finish.png' %>",
+        waypoint_icon = RELATIVE+"/<%= image_path 'hiking.png' %>";
     if (skip_middle == true)
       waypoint_icon = "http://maps.gstatic.com/mapfiles/transparent.png";
     markers[0].setIcon(start_icon);

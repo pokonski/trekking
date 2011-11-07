@@ -19,7 +19,7 @@
         %tr
           %td
             = link_to route.name, route
-            - if route.created_at > 2.hours.ago
+            - if route.created_at > 1.hours.ago
               %span.label.success New
           %td= route.user.try(:email)
           %td= time_ago_in_words(route.created_at, true)
