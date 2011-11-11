@@ -15,7 +15,11 @@
 
 .row
   .span13
-
+    %ul.tabs{"data-tabs" => "true"}
+      %li.active
+        %a{href: "#tab-map"} Map
+      %li#elevation-item{style: "display: none"}
+        %a{href: "#tab-elevation"} Elevation chart
   .span3
     %h2 Details
 
@@ -27,7 +31,8 @@
           %span.label.notice Instructions
           Right click on the map to place a waypoint, right click on the waypoint to remove it. Click and drag to move.
       #map{style: "width: 760px; height: 500px;"}
-      #chart_div{onmouseout: "clearPointer(pointer,markers)"}
+    #tab-elevation.tab-pane
+      #chart_div
   .span3
     %dl
       %dt Distance:
@@ -41,10 +46,10 @@
   var EDITABLE = #{can? :edit, @route};
   var UPDATE_PATH = "#{update_waypoints_route_path(@route, :json)}";
   var map, elevationService, chart;
+
   var path = null;
   var poland = new google.maps.LatLng(54.381579,18.596039);
   var waypoints = #{@route.waypoints.collect{|w| w.location}.to_json.html_safe};
-  var pointer = null;
 
 
   var markers = [];
@@ -55,13 +60,13 @@
       mapTypeId: google.maps.MapTypeId.ROADMAP,
       mapTypeControlOptions: {
         mapTypeIds: [google.maps.MapTypeId.ROADMAP,google.maps.MapTypeId.TERRAIN,google.maps.MapTypeId.SATELLITE]
-      },
+      }
       center: poland,
       streetViewControl: false,
       draggableCursor: 'pointer'
     };
     map = new google.maps.Map(document.getElementById("map"), mapOptions);
-    chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+    chart = new google.visualization.LineChart(document.getElementById('chart_div'));
     elevationService = new google.maps.ElevationService();
 
     // zaznacz na mapie punkty wczytane z bazy
@@ -84,21 +89,4 @@
        saveRoute(UPDATE_PATH,markers);
        $('#elevation-item').show();
     });
-    google.visualization.events.addListener(chart, 'onmouseover', function(e) {
-      if (pointer == null) {
-        pointer = new google.maps.Marker({
-          position: elevations[e.row].location,
-          map: map,
-          visible: true,
-          icon: RELATIVE+"#{image_path 'pointer.png'}"
-        });
-      } else {
-        pointer.setVisible(true);
-        pointer.setPosition(elevations[e.row].location);
-      }
-      $.each(markers,function(index,marker){
-        marker.setVisible(false);
-      });
-    });
   });
-

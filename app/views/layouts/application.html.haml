@@ -7,7 +7,7 @@
     %meta{name: "author", content: ""}
     %meta{name: "viewport", content: "width=device-width,initial-scale=1"}
     = stylesheet_link_tag "application"
-    %script{type: "text/javascript", src: 'https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1","packages":["corechart"]}]}'}
+    %script{type: "text/javascript", src: 'https://www.google.com/jsapi?autoload={"modules":[{"name":"visualization","version":"1","packages":["corechart","columnchart"]}]}'}
     %script{type: "text/javascript", src: "http://maps.google.com/maps/api/js?sensor=true"}
     = javascript_include_tag "application"
     = csrf_meta_tags
@@ -28,4 +28,9 @@
   %footer.footer
     .container
       %p
+        Projekt stworzony na laboratoria Architektury serwisów internetowych
+        %br
+        Repozytorium
+        = link_to "@github", "https://github.com/pokonski/trekking"
+        Kontakt
         = link_to "Piotrek Okoński","mailto:piotrek@okonski.org"
