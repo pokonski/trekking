@@ -1,6 +1,6 @@
 # Trekking
 
-Projekt stworzony na laboratoria z Architektury serwisów internetowych,
+Projekt stworzony na laboratoria z Architektury serwisów internetowych.
 
 ## Funkcjonalność
 
@@ -36,5 +36,6 @@ Do każdej ścieżki wyświetlane są dodatkowe informacje: jej całkowita dług
 * [mongoid](http://mongoid.org) - adapter MongoDB dla Ruby. Wzorowany na ActiveRecord, przez co użycie jest bardzo podobne.                                        
 * [haml](http://haml-lang.com/tutorial.html) - bardzo atrakcyjna warstwa zapisu HTMLa. Skraca czas potrzebny na napisanie kodu i zdecydowanie poprawia czytelność.                          
                                           
-                                    
-                                           
+### Grafika
+
+Przy tworzeniu wyglądu skorzystałem z biblioteki [bootstrap](http://twitter.github.com/bootstrap/) stworzonej przez Twittera. Zapewnia wygląd dla podstawowych elementów strony, oraz wsparcie dla wielu przeglądarek.                            
