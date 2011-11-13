@@ -22,7 +22,7 @@
       .alert-message.error{"data-alert" => true}
         %a.close{href: "#"} ×
         %p= alert
-    #main{role: "main"}
+    %article#main
       = yield
 
   %footer.footer
