@@ -18,7 +18,7 @@ $(function(){
     animate: true
   });
 });
-var RELATIVE = '/trek';
+var RELATIVE = '<%= Rails.env == 'production' ? "/trek" : "" %>';
 // probkowanie na wykresie
 var SAMPLES = 256;
 var elevations = [];
