@@ -42,7 +42,7 @@ Przy tworzeniu wyglądu skorzystałem z biblioteki [bootstrap](http://twitter.gi
 
 #### Użycie
 
-Sprowadza się do dołączenia jednego pliku CSS do naszej aplikacji. Przyĸład application.css:
+Sprowadza się do ściągnięcia ze strony http://twitter.github.com/bootstrap/ pliku bootstrap.css i dołączenia go do naszej aplikacji. Przyĸład application.css:
 
     /*
     *= require bootstrap
