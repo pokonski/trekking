@@ -38,4 +38,23 @@ Do każdej ścieżki wyświetlane są dodatkowe informacje: jej całkowita dług
                                           
 ### Grafika
 
-Przy tworzeniu wyglądu skorzystałem z biblioteki [bootstrap](http://twitter.github.com/bootstrap/) stworzonej przez Twittera. Zapewnia wygląd dla podstawowych elementów strony, oraz wsparcie dla wielu przeglądarek.                            
+Przy tworzeniu wyglądu skorzystałem z biblioteki [bootstrap](http://twitter.github.com/bootstrap/) stworzonej przez Twittera. Zapewnia wygląd dla podstawowych elementów strony, oraz wsparcie dla wielu przeglądarek.    
+
+#### Użycie
+
+Sprowadza się do dołączenia jednego pliku CSS do naszej aplikacji. Przyĸład application.css:
+
+    /*
+    *= require bootstrap
+    *= require_self
+    */
+    
+I to tyle. Potem możemy już korzystać ze styli, które udostępnia nam bootstrap. Kilka ciekawszych:
+
+* alerty: http://twitter.github.com/bootstrap/#alerts
+* menu poziome: http://twitter.github.com/bootstrap/#navigation
+* formularze: http://twitter.github.com/bootstrap/#forms
+
+Bootstrap narzuca pewien styl kodu HTML dla formularzy, który jest niekompatybilny z domyślnym zachowaniem takich gemów jak __simple_form__ czy __formtastic__. 
+Dlatego napisałem własny builder rozszerzający simple_form, który produkuje HTML odpowiedni dla styli bootstrapa. Znajduje się w pliku https://github.com/pokonski/trekking/blob/master/config/initializers/simple_form.rb
+   
