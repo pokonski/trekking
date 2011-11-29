@@ -81,6 +81,7 @@
        if (!EDITABLE)
         return false;
        addMarker(map,markers,e.latLng);
+       getElevation(markers);
        saveRoute(UPDATE_PATH,markers);
        $('#elevation-item').show();
     });
