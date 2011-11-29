@@ -47,7 +47,7 @@ function constructBounds(markers){
   return new google.maps.LatLngBounds(new google.maps.LatLng(min_lat,min_lng), new google.maps.LatLng(max_lat,max_lng) );
 }
 
-  function addMarker(map,markers,pos,skip_middle,url){
+  function addMarker(map,markers,pos,skip_middle,url, index){
     var marker = new google.maps.Marker({
         position: pos,
         draggable: EDITABLE,
@@ -68,14 +68,17 @@ function constructBounds(markers){
     });
     google.maps.event.addListener(marker, 'drag', function(e) {
       drawPath(markers);
-      getElevation(markers);
     });
     google.maps.event.addListener(marker, 'dragend', function(e) {
       setIcons(markers);
+      drawPath(markers);
+      getElevation(markers);
       saveRoute(UPDATE_PATH,markers);
-
     });
-    markers.push(marker);
+    if(index)
+      markers.splice(index, 0, marker);
+    else
+      markers.push(marker);
     setIcons(markers,skip_middle);
     drawPath(markers);
     return marker;
@@ -116,6 +119,48 @@ function constructBounds(markers){
       strokeOpacity: 0.8,
       strokeWeight: 2.5
     });
+
+    google.maps.event.addListener(path, 'rightclick', function(e) {
+      var insert_after, best_approx;
+      var pos1;
+      $.each(markers, function(index, marker){
+        var pos2 = marker.position;
+        if(pos1) {
+          var cur_approx = Math.abs((pos1.lat() - pos2.lat()) * (pos1.lng() - e.latLng.lng()) - (pos1.lat() - e.latLng.lat()) * (pos1.lng() - pos2.lng()));
+          if(!best_approx || cur_approx < best_approx) {
+            best_approx = cur_approx;
+            insert_after = index;
+          }
+        }
+        pos1 = pos2;
+
+      });
+      addMarker(map, markers, e.latLng, null, null, insert_after);
+      getElevation(markers);
+      saveRoute(UPDATE_PATH,markers);
+    });
+
+    google.maps.event.addListener(path, 'mouseover', function(e) {
+      if (pointer == null) {
+        pointer = new google.maps.Marker({
+          position: e.latLng,
+          map: map,
+          visible: true,
+          clickable: false,
+          icon: "/assets/pointer.png"
+        });
+      } else {
+        pointer.setVisible(true);
+        pointer.setPosition(e.latLng);
+      }
+    });
+
+    google.maps.event.addListener(path, 'mouseout', function(e) {
+      if (pointer) {
+        clearPointer(pointer,markers)
+      }
+    });
+
     path.setMap(map);
 
     $('#distance').text((path.Distance()/1000).toFixed(2)+" km");
